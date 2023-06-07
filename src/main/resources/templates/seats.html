@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Seats</title>
+</head>
+<body>
+<h1>Seats</h1>
+<table>
+    <thead>
+    <tr>
+        <th></th>
+        <th>A</th>
+        <th>B</th>
+        <th>C</th>
+        <th>D</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="seat : ${seats}">
+        <td th:text="${seat.name}"></td>
+        <td th:style="${seat.getStatus() == 'booked' ? 'background-color: lightgray;' : 'background-color: #4CAF50; cursor: pointer;'}"
+            th:data-seat-id="${seat.id}"
+            onclick="showModal(this.getAttribute('data-seat-id'))">
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div id="modal" style="display: none;">
+    <div id="modal-content">
+        <p>Bạn có muốn đặt ghế này không?</p>
+        <button onclick="bookSeat()">OK</button>
+        <button onclick="hideModal()">Cancel</button>
+    </div>
+</div>
+<script>
+    var selectedSeatId = null;
+
+    function showModal(seatId) {
+        selectedSeatId = seatId;
+        document.getElementById("modal").style.display = "block";
+    }
+
+    function hideModal() {
+        selectedSeatId = null;
+        document.getElementById("modal").style.display = "none";
+    }
+
+    function bookSeat() {
+        if (selectedSeatId) {
+            fetch("/bookSeat/" + selectedSeatId, {method: "POST"})
+                .then(response => response.json())
+                .then(seat => {
+                    if (seat.status == "BOOKED") {
+                        document.querySelector("[data-seat-id='" + seat.id + "']").style.backgroundColor = "lightgray";
+                        document.querySelector("[data-seat-id='" + seat.id + "']").removeAttribute("onclick");
+                    } else {
+                        alert("Ghế đã được đặt.");
+                    }
+                    hideModal();
+                });
+        }
+    }
+</script>
+</body>
+</html>

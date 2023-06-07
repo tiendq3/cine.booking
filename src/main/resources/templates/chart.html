@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Product Sales Chart</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+<div id="favoriteMoviesChart"></div>
+
+<script th:inline="javascript">
+    /* JavaScript code that retrieves the chart data and generates the chart */
+    var chartDataUrl = "api/v1/favorite-movies"
+    var chartData = [];
+
+    fetch(chartDataUrl)
+        .then(response => response.json())
+        .then(data => {
+            chartData = data;
+            createChart();
+        });
+
+    function createChart() {
+        Highcharts.chart('favoriteMoviesChart', {
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: 'Favorite Movies'
+            },
+            xAxis: {
+                categories: chartData.map(row => row.name)
+            },
+            yAxis: {
+                title: {
+                    text: 'Sales (USD)'
+                }
+            },
+            series: [
+                {
+                    name: 'RATES',
+                    data: chartData.map(row => row.rate)
+                }
+            ]
+        });
+    }
+</script>
+</body>
+</html>

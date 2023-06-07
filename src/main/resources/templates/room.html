@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Phòng đặt vé xem phim</title>
+</head>
+<body>
+<h1>Phòng đặt vé xem phim</h1>
+<table>
+    <tbody>
+    <tr th:each="seat : ${room.getSeats()}">
+        <td th:text="${seat.getName()}"></td>
+        <td th:text="${seat.getStatus()}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
