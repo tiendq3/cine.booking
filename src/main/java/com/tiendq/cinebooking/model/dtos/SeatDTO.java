@@ -1,10 +1,11 @@
 package com.tiendq.cinebooking.model.dtos;
 
-import com.tiendq.cinebooking.model.enums.EStatusSeat;
-import com.tiendq.cinebooking.model.enums.ETypeSeat;
+import com.tiendq.cinebooking.model.entities.Seat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotEmpty;
 
 @Data
 @AllArgsConstructor
@@ -13,13 +14,22 @@ public class SeatDTO {
 
     private Long id;
 
+    @NotEmpty(message = "tên ghế không được để trống")
     private String name;
 
-    private EStatusSeat status;
+    private String status;
 
-    private ETypeSeat type;
+    private String type;
 
-    private Double price;
+    private String roomName;
 
-    private RoomDTO roomDTO;
+    public SeatDTO(Seat seat) {
+        this.id = seat.getId();
+        this.name = seat.getName();
+        if (seat.getStatus() != null)
+            this.status = seat.getStatus().toString();
+        if (seat.getType() != null)
+            this.type = seat.getType().toString();
+        this.roomName = seat.getRoom().getName();
+    }
 }

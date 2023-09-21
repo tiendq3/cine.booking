@@ -54,10 +54,10 @@ public class BookingServiceImpl implements BookingService {
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Override
-    public Page<TicketDTO> getAllTicket(int page, int size) {
+    public Page<TicketDTO> getPagingTicket(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return bookingRepository
-                .findAll(pageable)
+                .findAllByShowtimeStartTimeEpochSecondGreaterThanNow(Instant.now(), pageable)
                 .map(TicketDTO::new);
     }
 
@@ -136,43 +136,6 @@ public class BookingServiceImpl implements BookingService {
         return new BookingRequest(seatNames, showtimeId);
     }
 
-//    @Transactional
-//    @Override
-//    public void bookingTicket(TicketDTO ticketDTO) {
-//        Showtime showtime = showtimeRepository.findById(ticketDTO.getShowtimeDTO().getId()).orElse(null);
-//        Film film = filmRepository.findById(ticketDTO.getFilmDTO().getId()).orElse(null);
-//        if (showtime == null || !showtime.getFilm().equals(film))
-//            throw new NotFoundException("The film was not found or not shown yet");
-//
-//        Seat seat = seatRepository.findById(ticketDTO.getSeatId()).orElse(null);
-//        if (seat == null) throw new NotFoundException("This seat not exist");
-//        if (!seat.getStatus().equals(EStatusSeat.ACTIVE))
-//            throw new BadRequestException("This seat is currently inactive");
-//        Set<Ticket> tickets = showtime.getTickets();
-//
-//        User user = userRepository.findUserByEmail(ticketDTO.getEmailUser());
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (user == null || ticketDTO.getEmailUser().equals(authentication.getName()))
-//            throw new UnAuthorityException("You need login for booking");
-//
-//
-//        Double price = showtime.getPrice();
-//        if (seat.getType().equals(ETypeSeat.vip))
-//            price += 30000;
-//
-//        Ticket ticket = Ticket
-//                .builder()
-//                .user(user)
-//                .seat(seat)
-//                .film(film)
-//                .status(EStatusTicket.BOOKED)
-//                .price(price)
-//                .showtime(showtime)
-//                .createdAt(Instant.now())
-//                .build();
-//        bookingRepository.save(ticket);
-//    }
-
     @Override
     public void updateTicket(Long id, TicketDTO newTicket) {
 
@@ -194,5 +157,14 @@ public class BookingServiceImpl implements BookingService {
             ticket.setUser(null);
         }
         bookingRepository.saveAll(tickets);
+    }
+
+    @Override
+    public List<TicketDTO> getAllTickets() {
+        List<Ticket> tickets = bookingRepository.findAll();
+        return tickets
+                .stream()
+                .map(TicketDTO::new)
+                .toList();
     }
 }

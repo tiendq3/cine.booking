@@ -58,7 +58,7 @@ public class FileServiceImpl implements FileService {
         file.delete();
     }
 
-    @Transactional
+//    @Transactional
     @Override
     public List<File> uploadFile(MultipartFile[] files) {
         log.warn("[SERVICE] - UPLOAD FILE REQUEST: " + Arrays.toString(files));
@@ -67,17 +67,7 @@ public class FileServiceImpl implements FileService {
         List<File> fileList = new ArrayList<>();
         for (MultipartFile file : files) {
             File newFile = new File();
-
-            // set file type
-            if (file == null || file.getContentType() == null) {
-                throw new RuntimeException("file mustn't null!");
-            } else if (file.getContentType().contains("video")) {
-                newFile.setType(EFileType.VIDEO);
-            } else if (file.getContentType().contains("image")) {
-                newFile.setType(EFileType.IMAGE);
-            } else
-                throw new RuntimeException("The file must be an image or a video!");
-
+            newFile.setType(EFileType.IMAGE);
             //set file ext
             String fileName = file.getOriginalFilename();
             assert fileName != null;
@@ -91,9 +81,8 @@ public class FileServiceImpl implements FileService {
             //hard code
             String filePath = "E:/workspace/WEB/cinebooking-fe/images/" + randomName;
             newFile.setPath(filePath);
-            fileRepository.save(newFile);
-            fileList.add(newFile);
 
+            fileList.add(newFile);
             //download file
             try {
                 file.transferTo(Paths.get(filePath));
@@ -101,6 +90,6 @@ public class FileServiceImpl implements FileService {
                 throw new RuntimeException(e);
             }
         }
-        return fileList;
+        return fileRepository.saveAll(fileList);
     }
 }

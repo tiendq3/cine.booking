@@ -1,7 +1,6 @@
 package com.tiendq.cinebooking.controller;
 
 import com.tiendq.cinebooking.model.dtos.RoomDTO;
-import com.tiendq.cinebooking.model.dtos.SeatDTO;
 import com.tiendq.cinebooking.service.RoomService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -33,15 +33,15 @@ public class RoomController {
 
     @PostMapping("/management/rooms")
     @ResponseStatus(HttpStatus.CREATED)
-    public void insertRoom(@RequestBody RoomDTO roomDTO) {
+    public void insertRoom(@RequestBody @Valid RoomDTO roomDTO) {
         log.warn("[CONTROLLER] - INSERT NEW ROOM: " + roomDTO);
         roomService.insertRoom(roomDTO);
     }
 
     @PatchMapping("/management/rooms/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateRoom(@PathVariable Long id, @RequestBody RoomDTO roomDTO) {
-        log.warn("[CONTROLLER] - UPDATE ROOM: " + roomDTO);
+    public void updateRoom(@PathVariable Long id, @RequestBody @Valid RoomDTO roomDTO) {
+        log.warn("[CONTROLLER] - UPDATE ROOM: " + roomDTO + ",ROOMID: " + id);
         roomService.updateRoom(id, roomDTO);
     }
 

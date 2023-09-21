@@ -1,7 +1,7 @@
 package com.tiendq.cinebooking.service;
 
 import com.tiendq.cinebooking.model.dtos.SeatDTO;
-import com.tiendq.cinebooking.model.entities.Seat;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,6 +9,8 @@ import java.util.List;
 @Service
 public interface SeatService {
     List<SeatDTO> getAllSeat();
+
+    Page<SeatDTO> getPagingSeats(int page, int size, String roomFilter);
 
     SeatDTO getSeatById(Long id);
 

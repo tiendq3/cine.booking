@@ -18,6 +18,6 @@ public interface FileService {
     @Transactional
     void deleteFile(Long id);
 
-    @Transactional
+//    @Transactional
     List<File> uploadFile(MultipartFile[] files);
 }

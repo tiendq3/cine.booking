@@ -5,8 +5,12 @@ import com.tiendq.cinebooking.model.entities.Showtime;
 import com.tiendq.cinebooking.model.entities.Ticket;
 import com.tiendq.cinebooking.model.entities.User;
 import com.tiendq.cinebooking.model.enums.EStatusTicket;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -24,4 +28,8 @@ public interface BookingRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findTicketsByCreatedAtLessThanEqualAndStatus(Instant time, EStatusTicket status);
 
     Ticket findTicketByShowtimeAndSeat(Showtime showtime, Seat seat);
+
+    @Query(value = "select * from tickets inner join showtimes on tickets.showtime_id = showtimes.id where showtimes.start_time >= :now"
+            , nativeQuery = true)
+    Page<Ticket> findAllByShowtimeStartTimeEpochSecondGreaterThanNow(@Param("now") Instant now, Pageable pageable);
 }

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,37 +27,43 @@ public class GlobalTranslateException {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<ErrorResponse> handlerUsernameNotFoundException(UsernameNotFoundException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException e, HttpServletRequest request) {
         return create(HttpStatus.NOT_FOUND, e.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ResponseEntity<ErrorResponse> handlerAuthenticationException(AuthenticationException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException e, HttpServletRequest request) {
         return create(HttpStatus.UNAUTHORIZED, e.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ResponseEntity<ErrorResponse> handlerUnAuthorityException(UnAuthorityException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleUnAuthorityException(UnAuthorityException e, HttpServletRequest request) {
         return create(HttpStatus.FORBIDDEN, e.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<ErrorResponse> handlerNotFoundException(NotFoundException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException e, HttpServletRequest request) {
         return create(HttpStatus.NOT_FOUND, e.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handlerValidUserName(BadRequestException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleValidUserName(BadRequestException e, HttpServletRequest request) {
         return create(HttpStatus.BAD_REQUEST, e.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handlerEmailExistException(EmailExistException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleEmailExistException(EmailExistException e, HttpServletRequest request) {
+        return create(HttpStatus.BAD_REQUEST, e.getMessage(), request.getRequestURI());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleDuplicateException(DuplicateException e, HttpServletRequest request) {
         return create(HttpStatus.BAD_REQUEST, e.getMessage(), request.getRequestURI());
     }
 
@@ -71,18 +79,18 @@ public class GlobalTranslateException {
         return errors;
     }
 
-//    @ExceptionHandler(Exception.class)
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    public ResponseEntity<ErrorResponse> handlerException(Exception e, HttpServletRequest request) {
-//        String error = e.getMessage();
-//        try {
-//            FileWriter fileWriter = new FileWriter("ExceptionRepo.txt", true);
-//            fileWriter.write("\n" + error);
-//            fileWriter.close();
-//        } catch (IOException ex) {
-//            System.out.println(ex);
-//        }
-//
-//        return create(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), request.getRequestURI());
-//    }
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<ErrorResponse> handlerException(Exception e, HttpServletRequest request) {
+        String error = e.getMessage();
+        try {
+            FileWriter fileWriter = new FileWriter("ExceptionRepo.txt", true);
+            fileWriter.write("\n" + error);
+            fileWriter.close();
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
+
+        return create(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), request.getRequestURI());
+    }
 }

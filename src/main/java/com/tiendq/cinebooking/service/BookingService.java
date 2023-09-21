@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 public interface BookingService {
-    Page<TicketDTO> getAllTicket(int page, int size);
+    Page<TicketDTO> getPagingTicket(int page, int size);
 
     TicketDTO getTicketById(Long id);
 
@@ -26,4 +26,6 @@ public interface BookingService {
     void deleteTicket(Long id);
 
     void cancelExpiredTickets();
+
+    List<TicketDTO> getAllTickets();
 }

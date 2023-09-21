@@ -57,9 +57,14 @@ public class BookingController {
     }
 
     @GetMapping("/management/tickets")
-    public ResponseEntity<Page<TicketDTO>> getAllTicket(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<Page<TicketDTO>> getPagingTicket(@RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(bookingService.getAllTicket(page, size));
+        return ResponseEntity.ok(bookingService.getPagingTicket(page, size));
+    }
+
+    @GetMapping("/tickets")
+    public ResponseEntity<List<TicketDTO>> getAllTickets() {
+        return ResponseEntity.ok(bookingService.getAllTickets());
     }
 
     @GetMapping("/tickets/{id}")

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -41,14 +42,11 @@ public class UserServiceImpl implements UserService {
                 .createdAt(Timestamp.from(Instant.now()))
                 .updatedAt(Timestamp.from(Instant.now()))
                 .build();
-        OTP otp = otpRepository.findByEmail(register.getEmail());
-        if (otp != null && otp.getOtp().equals(register.getOtp()) && (Instant.now().getEpochSecond() - otp.getCreateAt().getEpochSecond()) <= 120) {
+        List<OTP> otps = otpRepository.findByEmail(register.getEmail());
+        List<String> otpCodes = otps.stream().map(OTP::getOtp).toList();
+        if (otpCodes.size() != 0 && otpCodes.contains(register.getOtp())) {
             userRepository.save(newUser);
-            otpRepository.delete(otp);
         } else throw new RuntimeException("otp is incorrect or more than 2 minutes");
-        if (Instant.now().getEpochSecond() - otp.getCreateAt().getEpochSecond() > 120) {
-            otpRepository.delete(otp);
-        }
     }
 
     @Override

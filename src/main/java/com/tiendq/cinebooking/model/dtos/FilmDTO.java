@@ -1,10 +1,12 @@
 package com.tiendq.cinebooking.model.dtos;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tiendq.cinebooking.model.entities.Film;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -27,12 +29,17 @@ public class FilmDTO {
 
     private String description;
 
+    private Double rate;
+
     @NotNull
     private String time;
 
     private Set<CategoryDTO> categoryDTOS;
 
     private Set<FileDTO> fileDTOS;
+
+//    @JsonIgnore
+//    private MultipartFile[] files;
 
     public FilmDTO(Film film) {
         ModelMapper modelMapper = new ModelMapper();
@@ -41,6 +48,7 @@ public class FilmDTO {
         this.director = film.getDirector();
         this.actors = film.getActors();
         this.description = film.getDescription();
+        this.rate = film.getRate();
         this.time = film.getTime();
         this.categoryDTOS = film
                 .getCategories()

@@ -9,6 +9,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -48,5 +50,5 @@ public class Film implements Serializable {
     private Set<Category> categories;
 
     @ManyToMany
-    private Set<File> files;
+    private List<File> files = new ArrayList<>();
 }

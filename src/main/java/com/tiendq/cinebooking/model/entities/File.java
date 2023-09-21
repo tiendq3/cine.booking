@@ -6,6 +6,8 @@ import lombok.*;
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "files")
@@ -35,4 +37,5 @@ public class File implements Serializable {
     private Double size;
 
     private byte[] data;
+
 }

@@ -43,13 +43,15 @@ public class ShowtimeController {
 
     @PatchMapping("/management/showtimes/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateShowtime(@PathVariable Long id, @RequestBody ShowtimeDTO showtimeDTO){
-        showtimeService.updateShowtime(id,showtimeDTO);
+    public void updateShowtime(@PathVariable Long id,
+                               @RequestBody @Valid ShowtimeDTO showtimeDTO) {
+        log.warn("[CONTROLLER] - UPDATE SHOWTIME: ID - "+id+", SHOWTIME_DTO - "+showtimeDTO);
+        showtimeService.updateShowtime(id, showtimeDTO);
     }
 
     @DeleteMapping("/management/showtimes/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteShowtime(@PathVariable Long id){
+    public void deleteShowtime(@PathVariable Long id) {
         showtimeService.deleteShowtime(id);
     }
 }

@@ -7,7 +7,6 @@ import com.tiendq.cinebooking.model.entities.Film;
 import com.tiendq.cinebooking.model.entities.Room;
 import com.tiendq.cinebooking.model.entities.Showtime;
 import com.tiendq.cinebooking.model.entities.Ticket;
-import com.tiendq.cinebooking.model.enums.EStatusSeat;
 import com.tiendq.cinebooking.model.enums.EStatusTicket;
 import com.tiendq.cinebooking.repository.BookingRepository;
 import com.tiendq.cinebooking.repository.FilmRepository;
@@ -82,6 +81,62 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     @Transactional
     @Override
     public void insertShowtime(ShowtimeDTO showtimeDTO) {
+        Showtime showtime = validateShowtime(showtimeDTO);
+        // khi admin tạo ra 1 showtime --> đi kèm với đó việc tạo ra các vé cho showtime
+        showtimeRepository.save(showtime);
+        Set<Ticket> tickets = showtime
+                .getRoom()
+                .getSeats()
+                .stream()
+//                .filter(s -> s.getStatus().equals(EStatusSeat.ACTIVE))
+                .map(s -> Ticket.
+                        builder()
+                        .status(EStatusTicket.UN_BOOKED)
+                        .seat(s)
+                        .film(showtime.getFilm())
+                        .showtime(showtime)
+                        .room(showtime.getRoom())
+                        .build())
+                .collect(Collectors.toSet());
+        bookingRepository.saveAll(tickets);
+    }
+
+    @Override
+    public void updateShowtime(Long id, ShowtimeDTO showtimeDTO) {
+        Showtime showtime = showtimeRepository.findById(id).orElse(null);
+        if (showtime == null) throw new NotFoundException("not found showtime by id: " + id);
+        deleteShowtime(showtime.getId());
+
+        Showtime showtimeValidation = validateShowtime(showtimeDTO);
+        showtimeRepository.save(showtimeValidation);
+
+        Set<Ticket> newTickets = showtimeValidation
+                .getRoom()
+                .getSeats()
+                .stream()
+//                .filter(s -> s.getStatus().equals(EStatusSeat.ACTIVE))
+                .map(s -> Ticket.
+                        builder()
+                        .status(EStatusTicket.UN_BOOKED)
+                        .seat(s)
+                        .film(showtimeValidation.getFilm())
+                        .showtime(showtimeValidation)
+                        .room(showtimeValidation.getRoom())
+                        .build())
+                .collect(Collectors.toSet());
+        bookingRepository.saveAll(newTickets);
+    }
+
+    @Override
+    public void deleteShowtime(Long id) {
+        Showtime showtime = showtimeRepository.findById(id).orElse(null);
+        if (showtime == null) throw new NotFoundException("not found showtime by id: " + id);
+        List<Ticket> tickets = bookingRepository.findTicketByShowtimeId(id, Sort.by(Sort.Direction.ASC, "seat"));
+        bookingRepository.deleteAll(tickets);
+        showtimeRepository.delete(showtime);
+    }
+
+    Showtime validateShowtime(ShowtimeDTO showtimeDTO) {
         if (showtimeDTO.getStartTime().getEpochSecond() < Instant.now().getEpochSecond() ||
                 showtimeDTO.getStartTime().getEpochSecond() >= showtimeDTO.getEndTime().getEpochSecond())
             throw new BadRequestException("Start time cannot be before current or end time must be after start time");
@@ -104,44 +159,6 @@ public class ShowtimeServiceImpl implements ShowtimeService {
         showtime.setRoom(room);
         showtime.setFilm(film);
         showtime.setPrice(showtimeDTO.getPrice());
-
-        // khi admin tạo ra 1 showtime --> đi kèm với đó việc tạo ra các vé cho showtime
-        showtimeRepository.save(showtime);
-        Set<Ticket> tickets = room
-                .getSeats()
-                .stream()
-//                .filter(s -> s.getStatus().equals(EStatusSeat.ACTIVE))
-                .map(s -> Ticket.builder().status(EStatusTicket.UN_BOOKED).seat(s).film(film).showtime(showtime).room(room).build())
-                .collect(Collectors.toSet());
-        bookingRepository.saveAll(tickets);
-    }
-
-    @Override
-    public void updateShowtime(Long id, ShowtimeDTO showtimeDTO) {
-//        Showtime showtime = showtimeRepository.findById(id).orElse(null);
-//        if (showtime == null) throw new NotFoundException("not found showtime by id: " + id);
-//        Film film = filmRepository.findById(showtimeDTO.getFilmDTO().getId()).orElse(null);
-//        if (film == null) throw new NotFoundException("not exist this film");
-//
-//        Set<Room> rooms = new HashSet<>();
-//        for (RoomDTO roomDTO : showtimeDTO.getRoomDTOs()) {
-//            Room room = roomRepository.findById(roomDTO.getId()).orElse(null);
-//            if (room == null) throw new NotFoundException("not exist room: " + roomDTO.getName());
-//            rooms.add(room);
-//        }
-//        showtime.setStartTime(showtimeDTO.getStartTime());
-//        showtime.setEndTime(showtimeDTO.getEndTime());
-//        showtime.setRooms(rooms);
-//        showtime.setFilm(film);
-//        showtimeRepository.save(showtime);
-    }
-
-    @Override
-    public void deleteShowtime(Long id) {
-        Showtime showtime = showtimeRepository.findById(id).orElse(null);
-        if (showtime == null) throw new NotFoundException("not found showtime by id: " + id);
-        List<Ticket> tickets = bookingRepository.findTicketByShowtimeId(id, Sort.by(Sort.Direction.ASC, "seat"));
-        bookingRepository.deleteAll(tickets);
-        showtimeRepository.delete(showtime);
+        return showtime;
     }
 }
